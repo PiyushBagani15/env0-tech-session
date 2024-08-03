@@ -1,0 +1,48 @@
+---
+- name: Configure RHEL 9 EC2 instance as a web server
+  hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Install Apache HTTPD
+      dnf:
+        name: httpd
+        state: present
+
+    - name: Start and enable HTTPD service
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Add firewall rule for HTTP
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Ensure directory for website content exists
+      file:
+        path: /var/www/html
+        state: directory
+
+    - name: Deploy index.html
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Welcome to Our Web Server</title>
+          </head>
+          <body>
+            <h1>Hello, World!</h1>
+            <p>Welcome to our Apache server on RHEL 9.</p>
+          </body>
+          </html>
+
+    - name: Ensure HTTPD service is restarted after changes
+      systemd:
+        name: httpd
+        state: restarted

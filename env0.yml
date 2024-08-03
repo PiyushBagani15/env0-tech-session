@@ -10,5 +10,5 @@ deploy:
         - pip3 install --user ansible
         - ls -lah
         - cat Ansible/inventory
-        - cd Ansible && ansible-playbook --private-key /tmp/myKey.pem -i inventory dockerPlaybook.yaml
+        - cd Ansible && ansible-playbook --private-key /tmp/myKey.pem -i inventory Playbook.yaml
 
