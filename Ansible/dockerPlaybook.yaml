@@ -19,20 +19,11 @@
         state: present
       when: ansible_os_family == "RedHat"
 
-    - name: Add Docker repository (RedHat/CentOS)
-      yum_repository:
-        name: docker
-        description: Docker Repository
-        baseurl: https://download.docker.com/linux/centos/docker-ce.repo
-        gpgcheck: yes
-        gpgkey: https://download.docker.com/linux/centos/gpg
-        state: present
+    - name: Install Docker using Docker's official convenience script
+      shell: |
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
       when: ansible_os_family == "RedHat"
-
-    - name: Install Docker
-      package:
-        name: docker
-        state: present
 
     - name: Start Docker service
       service:

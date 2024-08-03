@@ -11,3 +11,4 @@ deploy:
         - ls -lah
         - cat Ansible/inventory
         - cd Ansible && ansible-playbook --private-key /tmp/myKey.pem -i inventory dockerPlaybook.yaml
+
