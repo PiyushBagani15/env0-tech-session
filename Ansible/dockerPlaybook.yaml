@@ -1,14 +1,28 @@
 ---
 - name: Setup HTTPD server in Docker container on EC2 instance
   hosts: all
-  become_user: root
   become: yes
+  become_user: root
   tasks:
-    - name: Install Docker 
-      command: yum install docker -y
+    - name: Install required packages for Docker
+      dnf:
+        name: 
+          - dnf-plugins-core
+          - docker
+        state: present
 
-    - name: Start Docker service
-      service:
+    - name: Add Docker repository
+      get_url:
+        url: https://download.docker.com/linux/fedora/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker engine
+      dnf:
+        name: docker-ce
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
         name: docker
         state: started
         enabled: yes
