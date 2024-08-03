@@ -9,7 +9,7 @@ resource "aws_vpc" "env0-vpc" {
 }
 
 resource "aws_subnet" "env0-subnet" {
-  vpc_id     = aws_vpc.env0.id
+  vpc_id     = aws_vpc.env0-vpc.id
   cidr_block = var.subnet_prefix
 
   tags = {
@@ -20,7 +20,7 @@ resource "aws_subnet" "env0-subnet" {
 resource "aws_security_group" "env0-sg" {
   name = "${var.prefix}-security-group"
 
-  vpc_id = aws_vpc.env0.id
+  vpc_id = aws_vpc.env0-vpc.id
 
   ingress {
     from_port   = 22
@@ -58,25 +58,23 @@ resource "aws_security_group" "env0-sg" {
 }
 
 resource "aws_internet_gateway" "env0-igw" {
-  vpc_id = aws_vpc.env0.id
-
+  vpc_id = aws_vpc.env0-vpc.id
   tags = {
     Name = "${var.prefix}-internet-gateway"
   }
 }
 
 resource "aws_route_table" "env0-rt" {
-  vpc_id = aws_vpc.env0.id
-
+  vpc_id = aws_vpc.env0-vpc.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.env0.id
+    gateway_id = aws_internet_gateway.env0-igw.id
   }
 }
 
 resource "aws_route_table_association" "env0-rta" {
-  subnet_id      = aws_subnet.env0.id
-  route_table_id = aws_route_table.env0.id
+  subnet_id      = aws_subnet.env0-subnet.id
+  route_table_id = aws_route_table.env0-rt.id
 }
 
 # data "aws_ami" "ubuntu" {
@@ -99,13 +97,13 @@ resource "aws_route_table_association" "env0-rta" {
 
 
 resource "aws_eip" "env0-eip" {
-  instance = aws_instance.env0.id
+  instance = aws_instance.env0-instance.id
   domain = "vpc"
 }
 
 resource "aws_eip_association" "env0-eipa" {
-  instance_id   = aws_instance.env0.id
-  allocation_id = aws_eip.env0.id
+  instance_id   = aws_instance.env0-instance.id
+  allocation_id = aws_eip.env0-eip.id
 }
 
 resource "aws_instance" "env0-instance" {
@@ -113,8 +111,8 @@ resource "aws_instance" "env0-instance" {
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.env0.key_name
   associate_public_ip_address = true
-  subnet_id                   = aws_subnet.env0.id
-  vpc_security_group_ids      = [aws_security_group.env0.id]
+  subnet_id                   = aws_subnet.env0-subnet
+  vpc_security_group_ids      = [aws_security_group.env0-sg.id]
 
   tags = {
     Name = "${var.prefix}-env0-docker-instance"
@@ -128,5 +126,5 @@ resource "tls_private_key" "env0-key" {
 
 resource "aws_key_pair" "env0-key-pair" {
   key_name   = var.my_aws_key
-  public_key = tls_private_key.env0.public_key_openssh
+  public_key = tls_private_key.env0-key.public_key_openssh
 }
