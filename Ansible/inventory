@@ -1,9 +1,9 @@
 [all:children]
-docker
+webserver
 
 [all:vars]
 ansible_user=ec2-user
 ansible_python_interpreter=/usr/bin/python3
 
-[docker]
-dockervm ansible_host=<placeholder_app>
+[webserver]
+webserver ansible_host=<placeholder_app>
