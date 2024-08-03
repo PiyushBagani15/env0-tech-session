@@ -79,21 +79,24 @@ resource "aws_route_table_association" "env0-rta" {
   route_table_id = aws_route_table.env0.id
 }
 
-data "aws_ami" "ubuntu" {
-  most_recent = true
+# data "aws_ami" "ubuntu" {
+#   most_recent = true
 
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
 
-  owners = ["099720109477"] # Canonical
-}
+#   owners = ["099720109477"] # Canonical
+# }
+
+
+
 
 resource "aws_eip" "env0-eip" {
   instance = aws_instance.env0.id
@@ -106,7 +109,7 @@ resource "aws_eip_association" "env0-eipa" {
 }
 
 resource "aws_instance" "env0-instance" {
-  ami                         = data.aws_ami.ubuntu.id
+  ami                         = "ami-022ce6f32988af5fa"
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.env0.key_name
   associate_public_ip_address = true
@@ -114,7 +117,7 @@ resource "aws_instance" "env0-instance" {
   vpc_security_group_ids      = [aws_security_group.env0.id]
 
   tags = {
-    Name = "${var.prefix}-env0-Jenkins-instance"
+    Name = "${var.prefix}-env0-docker-instance"
   }
 }
 
