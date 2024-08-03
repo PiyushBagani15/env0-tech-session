@@ -109,9 +109,9 @@ resource "aws_eip_association" "env0-eipa" {
 resource "aws_instance" "env0-instance" {
   ami                         = "ami-022ce6f32988af5fa"
   instance_type               = var.instance_type
-  key_name                    = aws_key_pair.env0.key_name
+  key_name                    = aws_key_pair.env0-key-pair.key_name
   associate_public_ip_address = true
-  subnet_id                   = aws_subnet.env0-subnet
+  subnet_id                   = aws_subnet.env0-subnet.id
   vpc_security_group_ids      = [aws_security_group.env0-sg.id]
 
   tags = {
