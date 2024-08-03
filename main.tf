@@ -98,7 +98,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_eip" "env0-eip" {
   instance = aws_instance.env0-instance.id
-  domain = "vpc"
+  domain   = "vpc"
 }
 
 resource "aws_eip_association" "env0-eipa" {

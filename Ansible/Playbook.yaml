@@ -3,59 +3,35 @@
   become_user: root
   become: true
   tasks:
-    - name: Install pip3 and unzip
+
+    - name: Install Apache HTTPD (apache2)
       apt:
-        update_cache: yes
-        pkg:
-        - python3-pip
-        - unzip
-      register: result
-      until: result is not failed
-      retries: 5
-      delay: 5
-
-    - name: Add Docker GPG apt Key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-
-    - name: Add Docker Repository
-      apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu focal stable
-        state: present
-
-    - name: Update apt and install docker-ce
-      apt:
-        name: docker-ce
+        name: apache2
         state: latest
-        update_cache: true
+        update_cache: yes
 
-    - name: Install Docker module for Python
-      pip:
-        name: docker
-
-    # Replace the following with the appropriate Python web framework or server module
-    - name: Install Flask to create a web server in Python
-      pip:
-        name: flask
-
-    - name: Change file ownership, group, and permissions
-      file:
-        path: /home/ubuntu/web_data
-        state: directory
-        recurse: yes
-        owner: ubuntu
-        group: ubuntu
-
-    - name: Create a simple Python Flask web server container
-      docker_container:
-        name: "flask_web_server"
-        image: "python:3.8-slim"
+    - name: Ensure Apache HTTPD is running and enabled
+      systemd:
+        name: apache2
         state: started
-        ports:
-          - "5000:5000"
-        volumes:
-          - /home/ubuntu/web_data:/app
-        command: "/usr/local/bin/flask run --host=0.0.0.0"
-        env:
-          FLASK_APP: /app/app.py
+        enabled: yes
+
+    - name: Allow HTTP traffic
+      ufw:
+        rule: allow
+        name: "Apache Full"
+
+    - name: Deploy index.html
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Welcome to Our Apache Server</title>
+          </head>
+          <body>
+            <h1>Hello, World!</h1>
+            <p>This is a test page served by Apache HTTPD on Ubuntu.</p>
+          </body>
+          </html>
