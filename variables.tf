@@ -26,5 +26,5 @@ variable "instance_type" {
 variable "my_aws_key" {
   type        = string
   description = "AWS key to SSH into EC2 instances"
-  default     = "mykey.pem"
+  default     = "env0key.pem"
 }

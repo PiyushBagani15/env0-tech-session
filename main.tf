@@ -1,4 +1,4 @@
-resource "aws_vpc" "env0" {
+resource "aws_vpc" "env0-vpc" {
   cidr_block           = var.address_space
   enable_dns_hostnames = true
 
@@ -8,7 +8,7 @@ resource "aws_vpc" "env0" {
   }
 }
 
-resource "aws_subnet" "env0" {
+resource "aws_subnet" "env0-subnet" {
   vpc_id     = aws_vpc.env0.id
   cidr_block = var.subnet_prefix
 
@@ -17,7 +17,7 @@ resource "aws_subnet" "env0" {
   }
 }
 
-resource "aws_security_group" "env0" {
+resource "aws_security_group" "env0-sg" {
   name = "${var.prefix}-security-group"
 
   vpc_id = aws_vpc.env0.id
@@ -30,8 +30,8 @@ resource "aws_security_group" "env0" {
   }
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -57,7 +57,7 @@ resource "aws_security_group" "env0" {
   }
 }
 
-resource "aws_internet_gateway" "env0" {
+resource "aws_internet_gateway" "env0-igw" {
   vpc_id = aws_vpc.env0.id
 
   tags = {
@@ -65,7 +65,7 @@ resource "aws_internet_gateway" "env0" {
   }
 }
 
-resource "aws_route_table" "env0" {
+resource "aws_route_table" "env0-rt" {
   vpc_id = aws_vpc.env0.id
 
   route {
@@ -74,7 +74,7 @@ resource "aws_route_table" "env0" {
   }
 }
 
-resource "aws_route_table_association" "env0" {
+resource "aws_route_table_association" "env0-rta" {
   subnet_id      = aws_subnet.env0.id
   route_table_id = aws_route_table.env0.id
 }
@@ -95,17 +95,17 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_eip" "env0" {
+resource "aws_eip" "env0-eip" {
   instance = aws_instance.env0.id
   domain = "vpc"
 }
 
-resource "aws_eip_association" "env0" {
+resource "aws_eip_association" "env0-eipa" {
   instance_id   = aws_instance.env0.id
   allocation_id = aws_eip.env0.id
 }
 
-resource "aws_instance" "env0" {
+resource "aws_instance" "env0-instance" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.env0.key_name
@@ -118,12 +118,12 @@ resource "aws_instance" "env0" {
   }
 }
 
-resource "tls_private_key" "env0" {
+resource "tls_private_key" "env0-key" {
   rsa_bits  = 4096
   algorithm = "RSA"
 }
 
-resource "aws_key_pair" "env0" {
+resource "aws_key_pair" "env0-key-pair" {
   key_name   = var.my_aws_key
   public_key = tls_private_key.env0.public_key_openssh
 }
