@@ -4,26 +4,8 @@
   become_user: root
   become: yes
   tasks:
-
-    - name: Update apt-get package lists (Ubuntu)
-      apt:
-        update_cache: yes
-      when: ansible_os_family == "Debian"
-
-    - name: Install required packages (RedHat/CentOS)
-      yum:
-        name:
-          - yum-utils
-          - device-mapper-persistent-data
-          - lvm2
-        state: present
-      when: ansible_os_family == "RedHat"
-
-    - name: Install Docker using Docker's official convenience script
-      shell: |
-        curl -fsSL https://get.docker.com -o get-docker.sh
-        sh get-docker.sh
-      when: ansible_os_family == "RedHat"
+    - name: Install Docker 
+      command: yum install docker -y
 
     - name: Start Docker service
       service:
