@@ -1,0 +1,13 @@
+version: 1
+
+deploy:
+  steps:
+    terraformOutput:
+      after:
+        - terraform output -raw private_key > /tmp/myKey.pem
+        - chmod 400 /tmp/myKey.pem
+        - sed -i "s/<placeholder_app>/$(terraform output -raw public_ip)/g" Ansible/inventory
+        - pip3 install --user ansible
+        - ls -lah
+        - cat Ansible/inventory
+        - cd Ansible && ansible-playbook --private-key /tmp/myKey.pem -i inventory dockerPlaybook.yaml
