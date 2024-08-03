@@ -1,48 +1,61 @@
 ---
-- name: Configure RHEL 9 EC2 instance as a web server
-  hosts: all
-  become: yes
+- hosts: all
   become_user: root
+  become: true
   tasks:
-    - name: Install Apache HTTPD
-      dnf:
-        name: httpd
+    - name: Install pip3 and unzip
+      apt:
+        update_cache: yes
+        pkg:
+        - python3-pip
+        - unzip
+      register: result
+      until: result is not failed
+      retries: 5
+      delay: 5
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
-    - name: Start and enable HTTPD service
-      systemd:
-        name: httpd
-        state: started
-        enabled: yes
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
 
-    - name: Add firewall rule for HTTP
-      firewalld:
-        service: http
-        permanent: true
-        state: enabled
-        immediate: true
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
 
-    - name: Ensure directory for website content exists
+    - name: Install Docker module for Python
+      pip:
+        name: docker
+
+    # Replace the following with the appropriate Python web framework or server module
+    - name: Install Flask to create a web server in Python
+      pip:
+        name: flask
+
+    - name: Change file ownership, group, and permissions
       file:
-        path: /var/www/html
+        path: /home/ubuntu/web_data
         state: directory
+        recurse: yes
+        owner: ubuntu
+        group: ubuntu
 
-    - name: Deploy index.html
-      copy:
-        dest: /var/www/html/index.html
-        content: |
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>Welcome to Our Web Server</title>
-          </head>
-          <body>
-            <h1>Hello, World!</h1>
-            <p>Welcome to our Apache server on RHEL 9.</p>
-          </body>
-          </html>
-
-    - name: Ensure HTTPD service is restarted after changes
-      systemd:
-        name: httpd
-        state: restarted
+    - name: Create a simple Python Flask web server container
+      docker_container:
+        name: "flask_web_server"
+        image: "python:3.8-slim"
+        state: started
+        ports:
+          - "5000:5000"
+        volumes:
+          - /home/ubuntu/web_data:/app
+        command: "/usr/local/bin/flask run --host=0.0.0.0"
+        env:
+          FLASK_APP: /app/app.py

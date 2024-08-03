@@ -2,8 +2,8 @@
 webserver
 
 [all:vars]
-ansible_user=ec2-user
+ansible_user=ubuntu
 ansible_python_interpreter=/usr/bin/python3
 
 [webserver]
-webserver ansible_host=<placeholder_app>
+webservervm ansible_host=<placeholder_app>
