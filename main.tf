@@ -3,8 +3,7 @@ resource "aws_vpc" "env0-vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    name        = "${var.prefix}-vpc-${var.aws_region}"
-    environment = "Dev"
+    name = "${var.prefix}-vpc-${var.aws_region}"
   }
 }
 
@@ -36,12 +35,6 @@ resource "aws_security_group" "env0-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 50000
-    to_port     = 50000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
 
   egress {
@@ -115,7 +108,7 @@ resource "aws_instance" "env0-instance" {
   vpc_security_group_ids      = [aws_security_group.env0-sg.id]
 
   tags = {
-    Name = "${var.prefix}-env0-docker-instance"
+    Name = "${var.prefix}-env0-webserver-instance"
   }
 }
 
