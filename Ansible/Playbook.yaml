@@ -31,7 +31,6 @@
             <title>Welcome to Our Apache Server</title>
           </head>
           <body>
-            <h1>Hello, World!</h1>
-            <p>This is a test page served by Apache HTTPD on Ubuntu.</p>
+            <h1>It Works!</h1>
           </body>
           </html>
