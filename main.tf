@@ -3,7 +3,7 @@ resource "aws_vpc" "env0-vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    name = "${var.prefix}-vpc-${var.aws_region}"
+    name = "${var.prefix}-vpc"
   }
 }
 
@@ -81,7 +81,7 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = ["099720109477"]
 }
 
 
@@ -106,7 +106,7 @@ resource "aws_instance" "env0-instance" {
   vpc_security_group_ids      = [aws_security_group.env0-sg.id]
 
   tags = {
-    Name = "${var.prefix}-env0-webserver-instance"
+    Name = "${var.prefix}-env0-instance"
   }
 }
 
